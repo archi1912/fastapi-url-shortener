@@ -1,0 +1,82 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+# WORKFLOW-LEVEL ENV VARIABLES
+env:
+  APP_NAME: "URL Shortener App"
+  GLOBAL_DEBUG: false
+  PYTHON_VERSION: "3.10"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    # JOB-LEVEL ENV VARIABLES
+    env:
+      GLOBAL_DEBUG: true
+      BUILD_STAGE: "Build Job"
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      DEBUG: ${{ secrets.DEBUG }}
+
+    steps:
+      # Preconfigured template: Checkout code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Setup Python environment
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      # Install dependencies
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # Lint code with flake8
+      - name: Lint with flake8
+        run: |
+          pip install flake8
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+
+      # Run unit tests and generate coverage report
+      - name: Run unit tests with coverage
+        run: |
+          pip install pytest pytest-cov
+          pytest --cov=./ --cov-report=xml
+
+      # Marketplace Action: Upload coverage to Codecov
+      - name: Upload to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage.xml
+          fail_ci_if_error: true
+          verbose: true
+
+      # STEP-LEVEL ENV VARIABLES
+      - name: Print variable scopes
+        env:
+          BUILD_STAGE: "Step Override"
+          STEP_ONLY: "This only exists here"
+        run: |
+          echo "Workflow APP_NAME: $APP_NAME"
+          echo "Job-level GLOBAL_DEBUG: $GLOBAL_DEBUG"
+          echo "Job-level BUILD_STAGE: $BUILD_STAGE"
+          echo "Step-level STEP_ONLY: $STEP_ONLY"
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy application
+        run: echo "Deployment step would go here (e.g., Docker, SSH, Heroku, etc.)"
