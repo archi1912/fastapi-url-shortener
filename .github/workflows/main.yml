@@ -51,6 +51,7 @@ jobs:
       - name: Run unit tests with coverage
         run: |
           pip install pytest pytest-cov
+          export PYTHONPATH=.
           pytest --cov=./ --cov-report=xml
 
       # Marketplace Action: Upload coverage to Codecov
