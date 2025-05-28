@@ -24,7 +24,7 @@ jobs:
           - 5432:5432
         env:
           POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: 0607
+          POSTGRES_PASSWORD: postgres
           POSTGRES_DB: url_shortener
         options: >-
           --health-cmd="pg_isready"
@@ -36,7 +36,7 @@ jobs:
     env:
       GLOBAL_DEBUG: true
       BUILD_STAGE: "Build Job"
-      DATABASE_URL: postgresql://postgres:0607@localhost:5432/url_shortener
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/url_shortener
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
       DEBUG: ${{ secrets.DEBUG }}
 
