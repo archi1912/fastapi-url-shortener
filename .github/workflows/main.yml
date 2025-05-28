@@ -6,27 +6,39 @@ on:
   pull_request:
     branches: [master]
 
+# Workflow-level environment variables
 env:
+  APP_NAME: "URL Shortener App"
+  GLOBAL_DEBUG: false
   PYTHON_VERSION: "3.10"
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
+    # Postgres service container
     services:
       postgres:
-        image: postgres:14  # Use stable version (17 is not official)
+        image: postgres:15
         ports:
           - 5432:5432
         env:
           POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres  
+          POSTGRES_PASSWORD: 0607
           POSTGRES_DB: url_shortener
         options: >-
-          --health-cmd="pg_isready -U postgres"
+          --health-cmd="pg_isready"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5
+
+    # Job-level environment variables
+    env:
+      GLOBAL_DEBUG: true
+      BUILD_STAGE: "Build Job"
+      DATABASE_URL: postgresql://postgres:0607@localhost:5432/url_shortener
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      DEBUG: ${{ secrets.DEBUG }}
 
     steps:
       - name: Checkout code
@@ -42,22 +54,22 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Wait for PostgreSQL to be ready
+      - name: Wait for Postgres to be ready
         run: |
-          echo "Waiting for Postgres to be ready..."
-          until pg_isready -h 127.0.0.1 -p 5432 -U postgres; do
-            sleep 2
-          done
+          sleep 10  # Ensure DB container is ready
 
-      - name: Run tests with coverage
-        env:
-          DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/url_shortener
+      - name: Lint with flake8
+        run: |
+          pip install flake8
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+
+      - name: Run unit tests with coverage
         run: |
           pip install pytest pytest-cov
           export PYTHONPATH=.
           pytest --cov=./ --cov-report=xml
 
-      - name: Upload to Codecov
+      - name: Upload coverage report to Codecov
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -65,10 +77,20 @@ jobs:
           fail_ci_if_error: true
           verbose: true
 
+      - name: Print variable scopes
+        env:
+          BUILD_STAGE: "Step Override"
+          STEP_ONLY: "This only exists here"
+        run: |
+          echo "Workflow APP_NAME: $APP_NAME"
+          echo "Job-level GLOBAL_DEBUG: $GLOBAL_DEBUG"
+          echo "Job-level BUILD_STAGE: $BUILD_STAGE"
+          echo "Step-level STEP_ONLY: $STEP_ONLY"
+
   deploy:
     needs: build
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy application
-        run: echo "Deployment step would go here"
+      - name: Dummy deploy step
+        run: echo "Deployment step would go here (e.g., Docker, SSH, Heroku, etc.)"
