@@ -48,7 +48,7 @@ jobs:
 
       - name: Run tests with coverage
         env:
-          DATABASE_URL: postgresql://postgres:0607@localhost:5432/url_shortener
+          DATABASE_URL: postgresql://postgres:0607@localhost/url_shortener
         run: |
           pip install pytest pytest-cov
           export PYTHONPATH=.
