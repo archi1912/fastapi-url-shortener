@@ -23,9 +23,9 @@ jobs:
         ports:
           - 5432:5432
         env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: url_shortener
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
         options: >-
           --health-cmd="pg_isready"
           --health-interval=10s
@@ -36,7 +36,7 @@ jobs:
     env:
       GLOBAL_DEBUG: true
       BUILD_STAGE: "Build Job"
-      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/url_shortener
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
       DEBUG: ${{ secrets.DEBUG }}
 
