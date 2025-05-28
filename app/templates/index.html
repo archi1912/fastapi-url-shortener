@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>URL Shortener</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <h2>Simple URL Shortener</h2>
+  <form method="post">
+    <input type="text" name="original" placeholder="Enter your long URL" required>
+    <button type="submit">Shorten</button>
+  </form>
+
+  {% if short_url %}
+    <p>Your shortened URL: <a href="{{ short_url }}">{{ request.url._url }}{{ short_url }}</a></p>
+  {% endif %}
+</body>
+</html>

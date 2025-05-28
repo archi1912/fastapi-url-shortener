@@ -1,0 +1,5 @@
+# Ignore virtual environment and env files
+env_url_shortener/
+.env
+__pycache__/
+*.pyc
