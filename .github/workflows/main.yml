@@ -35,7 +35,7 @@ jobs:
     env:
       GLOBAL_DEBUG: true
       BUILD_STAGE: "Build Job"
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      DATABASE_URL: postgresql://postgres:0607@localhost:5432/url_shortener
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
       DEBUG: ${{ secrets.DEBUG }}
 
