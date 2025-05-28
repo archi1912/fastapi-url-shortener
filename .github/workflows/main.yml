@@ -15,15 +15,15 @@ jobs:
 
     services:
       postgres:
-        image: postgres:15
+        image: postgres:14  # Use stable version (17 is not official)
         ports:
           - 5432:5432
         env:
           POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: 0607
+          POSTGRES_PASSWORD: postgres  
           POSTGRES_DB: url_shortener
         options: >-
-          --health-cmd="pg_isready"
+          --health-cmd="pg_isready -U postgres"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5
@@ -42,15 +42,16 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Wait for Postgres to be ready
+      - name: Wait for PostgreSQL to be ready
         run: |
+          echo "Waiting for Postgres to be ready..."
           until pg_isready -h 127.0.0.1 -p 5432 -U postgres; do
-            echo "Waiting for postgres..."; sleep 2;
+            sleep 2
           done
 
       - name: Run tests with coverage
         env:
-          DATABASE_URL: postgresql://postgres:0607@127.0.0.1:5432/url_shortener
+          DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/url_shortener
         run: |
           pip install pytest pytest-cov
           export PYTHONPATH=.
@@ -70,4 +71,4 @@ jobs:
 
     steps:
       - name: Deploy application
-        run: echo "Deployment step would go here (e.g., Docker, SSH, Heroku, etc.)"
+        run: echo "Deployment step would go here"
