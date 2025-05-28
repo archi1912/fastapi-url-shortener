@@ -6,7 +6,10 @@ on:
   pull_request:
     branches: [master]
 
+# WORKFLOW-LEVEL ENV VARIABLES
 env:
+  APP_NAME: "URL Shortener App"
+  GLOBAL_DEBUG: false
   PYTHON_VERSION: "3.10"
 
 jobs:
@@ -15,18 +18,26 @@ jobs:
 
     services:
       postgres:
-        image: postgres:13
-        ports:
-          - 5432:5432
+        image: postgres:15
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: 0607
           POSTGRES_DB: url_shortener
+        ports:
+          - 5432:5432
         options: >-
-          --health-cmd="pg_isready"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    # JOB-LEVEL ENV VARIABLES
+    env:
+      GLOBAL_DEBUG: true
+      BUILD_STAGE: "Build Job"
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      DEBUG: ${{ secrets.DEBUG }}
 
     steps:
       - name: Checkout code
@@ -42,15 +53,15 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Wait for Postgres to be ready
+      - name: Lint with flake8
         run: |
-          sleep 10  # Ensures Postgres is ready
+          pip install flake8
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
 
-      - name: Run tests with coverage
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      - name: Run unit tests with coverage
         run: |
           pip install pytest pytest-cov
+          export PYTHONPATH=.
           pytest --cov=./ --cov-report=xml
 
       - name: Upload to Codecov
@@ -60,6 +71,16 @@ jobs:
           files: ./coverage.xml
           fail_ci_if_error: true
           verbose: true
+
+      - name: Print variable scopes
+        env:
+          BUILD_STAGE: "Step Override"
+          STEP_ONLY: "This only exists here"
+        run: |
+          echo "Workflow APP_NAME: $APP_NAME"
+          echo "Job-level GLOBAL_DEBUG: $GLOBAL_DEBUG"
+          echo "Job-level BUILD_STAGE: $BUILD_STAGE"
+          echo "Step-level STEP_ONLY: $STEP_ONLY"
 
   deploy:
     needs: build
