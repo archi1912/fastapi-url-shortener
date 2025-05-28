@@ -6,7 +6,6 @@ on:
   pull_request:
     branches: [master]
 
-# WORKFLOW-LEVEL ENV VARIABLES
 env:
   APP_NAME: "URL Shortener App"
   GLOBAL_DEBUG: false
@@ -16,7 +15,21 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    # JOB-LEVEL ENV VARIABLES
+    services:
+      postgres:
+        image: postgres:13
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: testuser
+          POSTGRES_PASSWORD: testpassword
+          POSTGRES_DB: testdb
+        options: >-
+          --health-cmd="pg_isready"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
     env:
       GLOBAL_DEBUG: true
       BUILD_STAGE: "Build Job"
@@ -25,36 +38,30 @@ jobs:
       DEBUG: ${{ secrets.DEBUG }}
 
     steps:
-      # Preconfigured template: Checkout code
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Setup Python environment
       - name: Set up Python ${{ env.PYTHON_VERSION }}
         uses: actions/setup-python@v4
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      # Install dependencies
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # Lint code with flake8
       - name: Lint with flake8
         run: |
           pip install flake8
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
 
-      # Run unit tests and generate coverage report
       - name: Run unit tests with coverage
         run: |
           pip install pytest pytest-cov
           export PYTHONPATH=.
           pytest --cov=./ --cov-report=xml
 
-      # Marketplace Action: Upload coverage to Codecov
       - name: Upload to Codecov
         uses: codecov/codecov-action@v4
         with:
@@ -63,7 +70,6 @@ jobs:
           fail_ci_if_error: true
           verbose: true
 
-      # STEP-LEVEL ENV VARIABLES
       - name: Print variable scopes
         env:
           BUILD_STAGE: "Step Override"
