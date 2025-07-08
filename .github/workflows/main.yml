@@ -32,7 +32,7 @@ jobs:
           --health-timeout=5s
           --health-retries=5
 
-    # Job-level environment variables
+    # Job-level environment Variables
     env:
       GLOBAL_DEBUG: true
       BUILD_STAGE: "Build Job"
