@@ -46,7 +46,7 @@ jobs:
         shell: cmd
 
       - name: Wait for Postgres to be ready
-        shell: pwsh
+        shell: powershell
         run: |
           Write-Host "Waiting for Postgres..."
           Start-Sleep -Seconds 20
