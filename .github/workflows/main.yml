@@ -93,13 +93,6 @@ jobs:
           echo "Job-level BUILD_STAGE: $BUILD_STAGE"
           echo "Step-level STEP_ONLY: $STEP_ONLY"
         
-  build-selfhosted-linux:
-    runs-on: self-hosted && linux
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-      - run: echo "Hello from Linux self-hosted runner"
-
   build-selfhosted-windows:
     runs-on: self-hosted && windows
     steps:
