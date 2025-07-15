@@ -46,8 +46,10 @@ jobs:
         shell: cmd
 
       - name: Wait for Postgres to be ready
-        run: echo "Waiting for Postgres..." && timeout /t 20
-        shell: cmd
+        shell: pwsh
+        run: |
+          Write-Host "Waiting for Postgres..."
+          Start-Sleep -Seconds 20
 
       - name: Set up Python ${{ env.PYTHON_VERSION }}
         uses: actions/setup-python@v4
