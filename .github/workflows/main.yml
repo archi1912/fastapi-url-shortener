@@ -14,11 +14,7 @@ env:
 
 jobs:
   build-selfhosted-windows:
-    runs-on: self-hosted && Windows
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - run: echo "Hello from Windows self-hosted runner!"
+    runs-on: [self-hosted, Windows]
       
     # Postgres service container
     services:
@@ -45,6 +41,12 @@ jobs:
       DEBUG: ${{ secrets.DEBUG }}
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Say hello
+        run: echo "Hello from Windows self-hosted runner!"
+
       - name: Checkout code
         uses: actions/checkout@v3
 
