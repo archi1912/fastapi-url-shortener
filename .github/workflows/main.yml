@@ -94,11 +94,11 @@ jobs:
           echo "Step-level STEP_ONLY: $STEP_ONLY"
         
   build-selfhosted-windows:
-    runs-on: self-hosted && windows
+    runs-on: self-hosted && Windows
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v3
-      - run: echo "Hello from Windows self-hosted runner"
+      - run: echo "Hello from Windows self-hosted runner!"
       
   deploy:
     needs: build
