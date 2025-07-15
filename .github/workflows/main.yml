@@ -45,9 +45,7 @@ jobs:
         shell: cmd
 
       - name: Wait for Postgres to be ready
-        run: |
-          echo "Waiting for Postgres..."
-          timeout /t 20
+        run: echo "Waiting for Postgres..." && timeout /t 20
         shell: cmd
 
       - name: Set up Python ${{ env.PYTHON_VERSION }}
