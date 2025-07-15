@@ -16,22 +16,6 @@ jobs:
   build-selfhosted-windows:
     runs-on: [self-hosted, Windows]
       
-    # Postgres service container
-    services:
-      postgres:
-        image: postgres:15
-        ports:
-          - 5432:5432
-        env:
-          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
-        options: >-
-          --health-cmd="pg_isready"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
-
     # Job-level environment Variables
     env:
       GLOBAL_DEBUG: true
@@ -49,6 +33,22 @@ jobs:
 
       - name: Checkout code
         uses: actions/checkout@v3
+        
+      - name: Start PostgreSQL with Docker
+        run: |
+          docker run -d --name my_postgres ^
+            -p 5432:5432 ^
+            -e POSTGRES_USER=${{ secrets.POSTGRES_USER }} ^
+            -e POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} ^
+            -e POSTGRES_DB=${{ secrets.POSTGRES_DB }} ^
+            postgres:15
+        shell: cmd
+
+      - name: Wait for Postgres to be ready
+        run: |
+          echo "Waiting for Postgres..."
+          timeout /t 20
+        shell: cmd
 
       - name: Set up Python ${{ env.PYTHON_VERSION }}
         uses: actions/setup-python@v4
