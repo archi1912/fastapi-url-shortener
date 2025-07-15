@@ -15,7 +15,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-
+      
     # Postgres service container
     services:
       postgres:
@@ -92,7 +92,7 @@ jobs:
           echo "Job-level GLOBAL_DEBUG: $GLOBAL_DEBUG"
           echo "Job-level BUILD_STAGE: $BUILD_STAGE"
           echo "Step-level STEP_ONLY: $STEP_ONLY"
-        
+
   build-selfhosted-windows:
     runs-on: self-hosted && Windows
     steps:
