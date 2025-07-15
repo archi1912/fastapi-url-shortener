@@ -13,8 +13,12 @@ env:
   PYTHON_VERSION: "3.10"
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  build-selfhosted-windows:
+    runs-on: self-hosted && Windows
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - run: echo "Hello from Windows self-hosted runner!"
       
     # Postgres service container
     services:
@@ -92,13 +96,6 @@ jobs:
           echo "Job-level GLOBAL_DEBUG: $GLOBAL_DEBUG"
           echo "Job-level BUILD_STAGE: $BUILD_STAGE"
           echo "Step-level STEP_ONLY: $STEP_ONLY"
-
-  build-selfhosted-windows:
-    runs-on: self-hosted && Windows
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - run: echo "Hello from Windows self-hosted runner!"
       
   deploy:
     needs: build
