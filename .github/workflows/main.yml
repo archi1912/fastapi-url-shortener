@@ -100,7 +100,7 @@ jobs:
           echo "Step-level STEP_ONLY: $STEP_ONLY"
       
   deploy:
-    needs: build
+    needs: build-selfhosted-windows
     runs-on: ubuntu-latest
 
     steps:
