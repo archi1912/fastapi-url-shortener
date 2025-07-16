@@ -43,6 +43,10 @@ jobs:
           -e POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} ^
           -e POSTGRES_DB=${{ secrets.POSTGRES_DB }} ^
           postgres:15
+          
+      - name: Check Postgres logs
+        run: docker logs my_postgres
+        shell: cmd
 
       - name: Wait for Postgres to be ready
         shell: powershell
