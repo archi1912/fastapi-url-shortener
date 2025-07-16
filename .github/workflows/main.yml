@@ -24,6 +24,10 @@ jobs:
       DEBUG: ${{ secrets.DEBUG }}
 
     steps:
+      - name: Debug DATABASE_URL
+        run: echo DATABASE_URL=${{ env.DATABASE_URL }}
+        shell: cmd
+
       - name: Checkout code
         uses: actions/checkout@v3
 
