@@ -147,7 +147,7 @@ jobs:
         shell: powershell
         run: Start-Sleep -Seconds 10
 
-        #Integration test hitting running container:
+        #Integration test hitting running container
       - name: Integration test hitting / endpoint
         shell: cmd
         run: curl http://localhost:8000 || echo "Integration test failed"
