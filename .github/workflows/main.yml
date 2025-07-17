@@ -108,53 +108,55 @@ jobs:
           echo "Step-level STEP_ONLY: $STEP_ONLY"
       
   deploy:
-    needs: build-selfhosted-windows
-    runs-on: ubuntu-latest
+   needs: build-selfhosted-windows
+   runs-on: ubuntu-latest
 
-    steps:
-      - name: Dummy deploy step
-        run: echo "Deployment step would go here (e.g., Docker, SSH, Heroku, etc.)"
-        
-      # Build Docker image locally
-      - name: Build Docker image
-        run: docker build -t ghcr.io/${{ github.repository }}/url-shortener:latest .
-        
-      # Log in to GitHub Packages (GHCR)
-      - name: Log in to ghcr.io
-        run: echo
+   steps:
+    - name: Dummy deploy step
+      run: echo "Deployment step would go here (e.g., Docker, SSH, Heroku, etc.)"
+      
+    # Build Docker image locally
+    - name: Build Docker image
+      run: docker build -t ghcr.io/${{ github.repository }}/url-shortener:latest .
 
-      # Push Docker image to GitHub Packages
-      - name: Push Docker image
-        run: docker push ghcr.io/${{ github.repository }}/url-shortener:latest
+    # Log in to GitHub Packages (GHCR)
+    - name: Log in to ghcr.io
+      run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-      # Simulate “service container”:
-      - name: Remove previous container if exists
-        run: |
-          if (docker ps -a --format "{{.Names}}" | Select-String -Pattern "^url_shortener$") {
-            docker rm -f url_shortener
-          } else {
-            Write-Host "No previous container"
-          }
+    # Push Docker image to GitHub Packages
+    - name: Push Docker image
+      run: docker push ghcr.io/${{ github.repository }}/url-shortener:latest
 
-      - name: Pull image from GitHub Packages
-        run: docker pull ghcr.io/${{ github.repository }}/url-shortener:latest
+    # Remove previous container if exists
+    - name: Remove previous container if exists
+      run: |
+        if [ "$(docker ps -a -q -f name=url_shortener)" ]; then
+          docker rm -f url_shortener
+        else
+          echo "No previous container"
+        fi
 
-      - name: Run container locally (service container)
-        run: docker run -d --name url_shortener -p 8000:8000 ghcr.io/${{ github.repository }}/url-shortener:latest
+    # Pull image from GitHub Packages
+    - name: Pull image from GitHub Packages
+      run: docker pull ghcr.io/${{ github.repository }}/url-shortener:latest
 
-      - name: Wait for container to be ready
-        run: Start-Sleep -Seconds 10
+    # Run container locally (service container)
+    - name: Run container locally
+      run: docker run -d --name url_shortener -p 8000:8000 ghcr.io/${{ github.repository }}/url-shortener:latest
 
-      # Integration test hitting running container
-      - name: Integration test hitting / endpoint
-        run: |
-          try {
-            $response = Invoke-WebRequest -Uri http://localhost:8000 -UseBasicParsing -TimeoutSec 10
-            Write-Host "Integration test succeeded: $($response.StatusCode)"
-          } catch {
-            Write-Host "Integration test failed"
-            exit 1
-          }
+    # Wait for container to be ready
+    - name: Wait for container startup
+      run: sleep 10
+
+    # Integration test hitting running container
+    - name: Integration test hitting / endpoint
+      run: |
+        if curl --fail http://localhost:8000; then
+          echo "Integration test succeeded"
+        else
+          echo "Integration test failed"
+          exit 1
+        fi
 
 
 
