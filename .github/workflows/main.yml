@@ -115,28 +115,20 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    # 1) Build the image with the exact tag you plan to push
     - name: Build Docker image
-      run: |
-        docker build \
-          -t ghcr.io/archi1912/url-shortener:latest \
-          .
+      run: docker build -t ghcr.io/archi1912/url-shortener:latest .
 
-    # 2) (Optional) Debug: list all local images so you can see your newly-built tag
     - name: List local Docker images
       run: docker images
 
-    # 3) Authenticate to GHCR
-    - name: Log in to GitHub Container Registry
-      run: echo ${{ secrets.GITHUB_TOKEN }} \
-        | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+    #  Use PAT for login instead of GITHUB_TOKEN
+    - name: Log in to GHCR with PAT
+      run: echo ${{ secrets.GHCR_PAT }} | docker login ghcr.io -u archi1912 --password-stdin
 
-    # 4) Push the exact same tag you built
     - name: Push Docker image
       run: docker push ghcr.io/archi1912/url-shortener:latest
 
-    # … then your remove/pull/run/testing steps …
-    - name: Remove previous container
+    - name: Remove previous container if exists
       run: |
         if [ "$(docker ps -a -q -f name=url_shortener)" ]; then
           docker rm -f url_shortener
@@ -144,24 +136,23 @@ jobs:
           echo "No previous container"
         fi
 
-    - name: Pull image
+    - name: Pull image from GitHub Packages
       run: docker pull ghcr.io/archi1912/url-shortener:latest
 
-    - name: Run container
+    - name: Run container locally
       run: docker run -d --name url_shortener -p 8000:8000 ghcr.io/archi1912/url-shortener:latest
 
-    - name: Wait for startup
+    - name: Wait for container startup
       run: sleep 10
 
-    - name: Integration test
+    - name: Integration test hitting / endpoint
       run: |
         if curl --fail http://localhost:8000; then
           echo "Integration test succeeded"
         else
-          echo "Integration test failed"; exit 1
+          echo "Integration test failed"
+          exit 1
         fi
-
-
 
 
 
