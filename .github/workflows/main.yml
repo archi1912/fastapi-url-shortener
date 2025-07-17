@@ -150,7 +150,26 @@ jobs:
     
     - name: Show container logs
       run: docker logs url_shortener
-    
+
+    - name: Start services
+      run: docker-compose up -d
+
+    - name: Wait for Postgres to be ready
+      run: |
+        for i in {1..30}; do
+          docker-compose exec db pg_isready -U postgres && break
+          echo "Waiting for Postgres..."
+          sleep 2
+        done
+
+    - name: Wait for app to be ready
+      run: |
+        for i in {1..15}; do
+          curl --fail http://localhost:8000 && break
+          echo "Waiting for app..."
+          sleep 2
+        done
+        
     - name: Wait for app to start with retry
       run: |
         for i in {1..10}; do
