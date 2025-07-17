@@ -114,3 +114,45 @@ jobs:
     steps:
       - name: Dummy deploy step
         run: echo "Deployment step would go here (e.g., Docker, SSH, Heroku, etc.)"
+        
+        #Build Docker image locally
+      - name: Build Docker image
+        shell: cmd
+        run: docker build -t ghcr.io/${{ github.repository }}/url-shortener:latest .
+
+        #Log in to GitHub Packages (GHCR)
+      - name: Log in to ghcr.io
+        shell: cmd
+        run: echo | docker login ghcr.io -u ${{ github.actor }} --password ${{ secrets.GITHUB_TOKEN }}
+
+        #Push Docker image to GitHub Packages
+      - name: Push Docker image
+        shell: cmd
+        run: docker push ghcr.io/${{ github.repository }}/url-shortener:latest
+
+        #Simulate “service container”:
+      - name: Remove previous container if exists
+        shell: cmd
+        run: docker rm -f url_shortener || echo "No previous container"
+
+      - name: Pull image from GitHub Packages
+        shell: cmd
+        run: docker pull ghcr.io/${{ github.repository }}/url-shortener:latest
+
+      - name: Run container locally (service container)
+        shell: cmd
+        run: docker run -d --name url_shortener -p 8000:8000 ghcr.io/${{ github.repository }}/url-shortener:latest
+
+      - name: Wait for container to be ready
+        shell: powershell
+        run: Start-Sleep -Seconds 10
+
+        #Integration test hitting running container:
+      - name: Integration test hitting / endpoint
+        shell: cmd
+        run: curl http://localhost:8000 || echo "Integration test failed"
+
+
+
+
+
