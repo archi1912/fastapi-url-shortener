@@ -128,7 +128,7 @@ jobs:
 
     # Push Docker image to GitHub Packages
     - name: Push Docker image
-      run: docker push ghcr.io/${{ github.repository }}/url-shortener:latest
+      run: docker push ghcr.io/archi1912/url-shortener:latest
 
     # Remove previous container if exists
     - name: Remove previous container if exists
