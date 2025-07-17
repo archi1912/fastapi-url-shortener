@@ -115,42 +115,54 @@ jobs:
       - name: Dummy deploy step
         run: echo "Deployment step would go here (e.g., Docker, SSH, Heroku, etc.)"
         
-        #Build Docker image locally
+      # Build Docker image locally
       - name: Build Docker image
-        shell: cmd
+        shell: pwsh
         run: docker build -t ghcr.io/${{ github.repository }}/url-shortener:latest .
 
-        #Log in to GitHub Packages (GHCR)
+      # Log in to GitHub Packages (GHCR)
       - name: Log in to ghcr.io
-        shell: cmd
-        run: echo | docker login ghcr.io -u ${{ github.actor }} --password ${{ secrets.GITHUB_TOKEN }}
+        shell: pwsh
+        run: echo
 
-        #Push Docker image to GitHub Packages
+      # Push Docker image to GitHub Packages
       - name: Push Docker image
-        shell: cmd
+        shell: pwsh
         run: docker push ghcr.io/${{ github.repository }}/url-shortener:latest
 
-        #Simulate “service container”:
+      # Simulate “service container”:
       - name: Remove previous container if exists
-        shell: cmd
-        run: docker rm -f url_shortener || echo "No previous container"
+        shell: pwsh
+        run: |
+          if (docker ps -a --format "{{.Names}}" | Select-String -Pattern "^url_shortener$") {
+            docker rm -f url_shortener
+          } else {
+            Write-Host "No previous container"
+          }
 
       - name: Pull image from GitHub Packages
-        shell: cmd
+        shell: pwsh
         run: docker pull ghcr.io/${{ github.repository }}/url-shortener:latest
 
       - name: Run container locally (service container)
-        shell: cmd
+        shell: pwsh
         run: docker run -d --name url_shortener -p 8000:8000 ghcr.io/${{ github.repository }}/url-shortener:latest
 
       - name: Wait for container to be ready
-        shell: powershell
+        shell: pwsh
         run: Start-Sleep -Seconds 10
 
-        #Integration test hitting running container
+      # Integration test hitting running container
       - name: Integration test hitting / endpoint
-        shell: cmd
-        run: curl http://localhost:8000 || echo "Integration test failed"
+        shell: pwsh
+        run: |
+          try {
+            $response = Invoke-WebRequest -Uri http://localhost:8000 -UseBasicParsing -TimeoutSec 10
+            Write-Host "Integration test succeeded: $($response.StatusCode)"
+          } catch {
+            Write-Host "Integration test failed"
+            exit 1
+          }
 
 
 
