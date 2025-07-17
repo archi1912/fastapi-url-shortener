@@ -152,12 +152,12 @@ jobs:
       run: docker logs url_shortener
 
     - name: Start services
-      run: docker-compose up -d
+      run: docker compose up -d
 
     - name: Wait for Postgres to be ready
       run: |
         for i in {1..30}; do
-          docker-compose exec db pg_isready -U postgres && break
+          docker compose exec db pg_isready -U postgres && break
           echo "Waiting for Postgres..."
           sleep 2
         done
