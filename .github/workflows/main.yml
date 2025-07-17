@@ -114,24 +114,29 @@ jobs:
    steps:
     - name: Checkout code
       uses: actions/checkout@v3
-      
-    - name: Dummy deploy step
-      run: echo "Deployment step would go here (e.g., Docker, SSH, Heroku, etc.)"
-      
-    # Build Docker image locally
+
+    # 1) Build the image with the exact tag you plan to push
     - name: Build Docker image
-      run: docker build -t ghcr.io/${{ github.repository }}/url-shortener:latest .
+      run: |
+        docker build \
+          -t ghcr.io/archi1912/url-shortener:latest \
+          .
 
-    # Log in to GitHub Packages (GHCR)
-    - name: Log in to ghcr.io
-      run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+    # 2) (Optional) Debug: list all local images so you can see your newly-built tag
+    - name: List local Docker images
+      run: docker images
 
-    # Push Docker image to GitHub Packages
+    # 3) Authenticate to GHCR
+    - name: Log in to GitHub Container Registry
+      run: echo ${{ secrets.GITHUB_TOKEN }} \
+        | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+    # 4) Push the exact same tag you built
     - name: Push Docker image
       run: docker push ghcr.io/archi1912/url-shortener:latest
 
-    # Remove previous container if exists
-    - name: Remove previous container if exists
+    # … then your remove/pull/run/testing steps …
+    - name: Remove previous container
       run: |
         if [ "$(docker ps -a -q -f name=url_shortener)" ]; then
           docker rm -f url_shortener
@@ -139,27 +144,23 @@ jobs:
           echo "No previous container"
         fi
 
-    # Pull image from GitHub Packages
-    - name: Pull image from GitHub Packages
-      run: docker pull ghcr.io/${{ github.repository }}/url-shortener:latest
+    - name: Pull image
+      run: docker pull ghcr.io/archi1912/url-shortener:latest
 
-    # Run container locally (service container)
-    - name: Run container locally
-      run: docker run -d --name url_shortener -p 8000:8000 ghcr.io/${{ github.repository }}/url-shortener:latest
+    - name: Run container
+      run: docker run -d --name url_shortener -p 8000:8000 ghcr.io/archi1912/url-shortener:latest
 
-    # Wait for container to be ready
-    - name: Wait for container startup
+    - name: Wait for startup
       run: sleep 10
 
-    # Integration test hitting running container
-    - name: Integration test hitting / endpoint
+    - name: Integration test
       run: |
         if curl --fail http://localhost:8000; then
           echo "Integration test succeeded"
         else
-          echo "Integration test failed"
-          exit 1
+          echo "Integration test failed"; exit 1
         fi
+
 
 
 
