@@ -1,29 +1,24 @@
 version: '3.9'
-
 services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: urlshortener
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
   web:
-    build: .
-    container_name: url_shortener
+    image: ghcr.io/archi1912/url-shortener:latest
     ports:
       - "8000:8000"
     depends_on:
       - db
     environment:
-      - DATABASE_URL=postgresql://postgres:password@db:5432/urlshortener
-    volumes:
-      - .:/app
-
-  db:
-    image: postgres:13
-    container_name: postgres_db
-    restart: always
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: urlshortener
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
+      DATABASE_URL: postgresql://postgres:password@db:5432/urlshortener
 
 volumes:
   postgres_data:
-
