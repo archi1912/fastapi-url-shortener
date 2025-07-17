@@ -1,7 +1,8 @@
 version: '3.9'
+
 services:
   db:
-    image: postgres:15
+    image: postgres:13
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
@@ -10,15 +11,25 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
 
   web:
-    image: ghcr.io/archi1912/url-shortener:latest
+    build: .
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    volumes:
+      - .:/app
     ports:
       - "8000:8000"
+    env_file:
+      - .env
     depends_on:
       - db
-    environment:
-      DATABASE_URL: postgresql://postgres:password@db:5432/urlshortener
+    networks:
+      - app-network
 
 volumes:
   postgres_data:
+
+networks:
+  app-network:
