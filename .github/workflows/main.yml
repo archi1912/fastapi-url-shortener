@@ -122,11 +122,13 @@ jobs:
       run: docker images
 
     #  Use PAT for login instead of GITHUB_TOKEN
-    - name: Log in to GHCR with PAT
+    - name: Log in to GHCR with PAT (PowerShell)
       shell: powershell
+      env:
+        GHCR_PAT: ${{ secrets.GHCR_PAT }}
       run: |
-        $Env:GHCR_PAT = "${{ secrets.GHCR_PAT }}"
-        echo $Env:GHCR_PAT | docker login ghcr.io -u archi1912 --password-stdin
+        docker logout ghcr.io
+        $GHCR_PAT | docker login ghcr.io -u archi1912 --password-stdin
 
     - name: Push Docker image
       run: docker push ghcr.io/archi1912/url-shortener:latest
