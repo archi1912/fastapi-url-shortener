@@ -126,12 +126,15 @@ jobs:
       run: docker logout ghcr.io
       shell: powershell
 
-    - name: Docker login to ghcr.io
+    - name: Docker login to ghcr.io (PowerShell safe)
       shell: powershell
       env:
         GHCR_PAT: ${{ secrets.GHCR_PAT }}
-      run: echo "$GHCR_PAT" | docker login ghcr.io -u archi1912 --password-stdin
-
+      run: |
+        $Env:GHCR_PAT | Out-File -FilePath pat.txt -Encoding ascii
+        docker login ghcr.io -u archi1912 --password-stdin < pat.txt
+        Remove-Item pat.txt
+        
     - name: Push Docker image
       run: docker push ghcr.io/archi1912/url-shortener:latest
 
