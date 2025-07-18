@@ -12,8 +12,10 @@ env:
   PYTHON_VERSION: "3.10"
 
 jobs:
-  build-selfhosted-windows:
-    runs-on: [self-hosted, Windows]
+  # build-selfhosted-windows:
+  #   runs-on: [self-hosted, Windows]
+  build:
+    runs-on: ubuntu-latest
       
     # Job-level environment Variables
     env:
