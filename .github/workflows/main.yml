@@ -42,7 +42,7 @@ jobs:
         run: |
           docker rm -f my_postgres || echo "Container not found"
           docker run -d --name my_postgres ^
-          -p 5432:5432 ^
+          -p 5435:5432 ^
           -e POSTGRES_USER=${{ secrets.POSTGRES_USER }} ^
           -e POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} ^
           -e POSTGRES_DB=${{ secrets.POSTGRES_DB }} ^
