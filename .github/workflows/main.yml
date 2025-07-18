@@ -13,7 +13,7 @@ env:
 
 jobs:
   build-selfhosted-windows:
-    runs-on: [self-hosted, Windows]
+    runs-on: ubuntu-latest
       
     # Job-level environment Variables
     env:
