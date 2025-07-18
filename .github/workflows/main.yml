@@ -131,9 +131,9 @@ jobs:
       env:
         GHCR_PAT: ${{ secrets.GHCR_PAT }}
       run: |
-        $Env:GHCR_PAT | Out-File -FilePath pat.txt -Encoding ascii
-        docker login ghcr.io -u archi1912 --password-stdin < pat.txt
-        Remove-Item pat.txt
+        $pass = ConvertTo-SecureString $Env:GHCR_PAT -AsPlainText -Force
+        $cred = New-Object System.Management.Automation.PSCredential ("archi1912", $pass)
+        docker login ghcr.io --username archi1912 --password-stdin <<< $Env:GHCR_PAT
         
     - name: Push Docker image
       run: docker push ghcr.io/archi1912/url-shortener:latest
