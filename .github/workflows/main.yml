@@ -109,7 +109,7 @@ jobs:
       
   deploy:
    needs: build-selfhosted-windows
-   runs-on: ubuntu-latest
+   runs-on: [self-hosted, Windows]
 
    steps:
     - name: Checkout code
