@@ -124,10 +124,10 @@ jobs:
     #  Use PAT for login instead of GITHUB_TOKEN
     - name: Docker logout
       run: docker logout ghcr.io
-      shell: bash
+      shell: powershell
 
     - name: Docker login to ghcr.io
-      shell: bash
+      shell: powershell
       env:
         GHCR_PAT: ${{ secrets.GHCR_PAT }}
       run: echo "$GHCR_PAT" | docker login ghcr.io -u archi1912 --password-stdin
