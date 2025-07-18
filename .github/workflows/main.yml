@@ -208,7 +208,14 @@ jobs:
             Start-Sleep -Seconds 2
           }
         }
-        
+    - name: Show running containers
+      shell: powershell
+      run: docker ps -a
+
+    - name: Show app container logs
+      shell: powershell
+      run: docker logs url_shortener
+  
     - name: Wait for app to start with retry
       shell: powershell
       run: |
