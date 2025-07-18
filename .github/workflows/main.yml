@@ -148,6 +148,16 @@ jobs:
     - name: Pull image from GitHub Packages
       run: docker pull ghcr.io/archi1912/url-shortener:latest
 
+    - name: Remove previous container if exists
+      shell: powershell
+      run: |
+        if (docker ps -a -q -f name=url_shortener) {
+          docker rm -f url_shortener
+          echo "Removed existing url_shortener container"
+        } else {
+          echo "No previous container to remove"
+        }
+
     - name: Run container locally
       run: docker run -d --name url_shortener -p 8000:8000 -e DATABASE_URL="${{ secrets.DATABASE_URL }}" ghcr.io/archi1912/url-shortener:latest
 
