@@ -159,7 +159,7 @@ jobs:
         }
 
     - name: Run container locally
-      run: docker run -d --name url_shortener -p 8000:8000 -e DATABASE_URL="${{ secrets.DATABASE_URL_DEPLOY }}" ghcr.io/archi1912/url-shortener:latest
+      run: docker run -d  -p 8000:8000 -e DATABASE_URL="${{ secrets.DATABASE_URL_DEPLOY }}" ghcr.io/archi1912/url-shortener:latest
 
     - name: Wait for container startup
       run: sleep 10
