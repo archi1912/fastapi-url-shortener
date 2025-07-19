@@ -139,7 +139,7 @@ jobs:
     - name: Remove previous container if exists
       shell: powershell
       run: |
-        $container = docker ps -a -q -f name=***
+        $container = docker ps -a -q -f name=url-shortener
         if ($container) {
           docker rm -f ***
         } else {
