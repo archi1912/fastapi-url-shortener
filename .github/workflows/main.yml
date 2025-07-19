@@ -153,7 +153,7 @@ jobs:
       shell: powershell
       run: |
         if (docker ps -a -q -f name=url-shortener) {
-          docker rm -f url_shortener
+          docker rm -f url-shortener
           echo "Removed existing url_shortener container"
         } else {
           echo "No previous container to remove"
