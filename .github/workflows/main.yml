@@ -139,7 +139,7 @@ jobs:
     - name: Remove previous container if exists
       shell: powershell
       run: |
-        $container = docker ps -a -q -f name=url-shortener
+        $container = docker ps -a -q -f name=***
         if ($container) {
           docker rm -f ***
         } else {
@@ -152,7 +152,7 @@ jobs:
     - name: Remove previous container if exists
       shell: powershell
       run: |
-        if (docker ps -a -q -f name=url_shortener) {
+        if (docker ps -a -q -f name=url-shortener) {
           docker rm -f url_shortener
           echo "Removed existing url_shortener container"
         } else {
@@ -160,7 +160,7 @@ jobs:
         }
 
     - name: Run container locally
-      run: docker run -d --name url-shortenerr  -p 8000:8000 -e DATABASE_URL="${{ secrets.DATABASE_URL_DEPLOY }}" ghcr.io/archi1912/url-shortener:latest
+      run: docker run -d --name url-shortener  -p 8000:8000 -e DATABASE_URL="${{ secrets.DATABASE_URL_DEPLOY }}" ghcr.io/archi1912/url-shortener:latest
 
     - name: Wait for container startup
       run: sleep 10
@@ -212,7 +212,7 @@ jobs:
 
     - name: Show app container logs
       shell: powershell
-      run: docker logs url-shortenerr
+      run: docker logs url-shortener
   
     - name: Wait for app to start with retry
       shell: powershell
