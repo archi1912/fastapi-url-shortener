@@ -212,7 +212,7 @@ jobs:
 
     - name: Show app container logs
       shell: powershell
-      run: docker logs url_shortener
+      run: docker logs url-shortener
   
     - name: Wait for app to start with retry
       shell: powershell
