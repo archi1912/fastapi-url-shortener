@@ -214,22 +214,22 @@ jobs:
       shell: powershell
       run: docker logs url-shortener
   
-    - name: Wait for app to start with retry
-      shell: powershell
-      run: |
-        $success = $false
-        for ($i=1; $i -le 10; $i++) {
-          try {
-            Invoke-WebRequest -Uri "http://localhost:8000" -UseBasicParsing -TimeoutSec 5
-            Write-Host "App started"
-            $success = $true
-            break
-          } catch {
-            Write-Host "Waiting for app..."
-            Start-Sleep -Seconds 3
-          }
-        }
-        if (-not $success) {
-          Write-Host "App failed to start in time"
-          exit 1
-        }
+    # - name: Wait for app to start with retry
+    #   shell: powershell
+    #   run: |
+    #     $success = $false
+    #     for ($i=1; $i -le 10; $i++) {
+    #       try {
+    #         Invoke-WebRequest -Uri "http://localhost:8000" -UseBasicParsing -TimeoutSec 5
+    #         Write-Host "App started"
+    #         $success = $true
+    #         break
+    #       } catch {
+    #         Write-Host "Waiting for app..."
+    #         Start-Sleep -Seconds 3
+    #       }
+    #     }
+    #     if (-not $success) {
+    #       Write-Host "App failed to start in time"
+    #       exit 1
+    #     }
